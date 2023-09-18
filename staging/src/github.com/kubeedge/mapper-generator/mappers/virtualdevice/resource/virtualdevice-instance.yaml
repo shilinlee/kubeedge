@@ -1,0 +1,112 @@
+apiVersion: devices.kubeedge.io/v1alpha2
+kind: Device
+metadata:
+  name: random-instance-01
+  labels:
+    model: random-01
+spec:
+  deviceModelRef:
+    name: random-01
+  protocol:
+    customizedProtocol:
+      protocolName: virtualProtocol
+      configData:
+        deviceID: 2
+    common:
+      com:
+        serialPort: '/dev/ttyS0'
+        baudRate: 9600
+        dataBits: 8
+        parity: even
+        stopBits: 1
+      customizedValues:
+        protocolID: 1
+  nodeSelector:
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: ''
+            operator: In
+            values:
+              - edge-node
+  propertyVisitors:
+    - propertyName: random-int
+      collectCycle: 10000000000
+      customizedProtocol:
+        protocolName: virtualProtocol
+        configData:
+          dataType: int
+      pushMethod:
+        mqtt:
+          address: tcp://0.0.0.0:1883
+          topic: random-int
+          qos: 0
+          retained: false
+#        http:
+#          hostName: "http://127.0.0.1"
+#          port: 30014
+#          timeout: 1000000
+      reportCycle: 10000000000
+      dbProvider:
+        tdengine:
+          tdengineConfigData:
+            dsn: "root:taosdata@http(127.0.0.1:6041)/test"
+#        redis:
+#          redisConfigData:
+#            addr: "127.0.0.1:6379"
+#            password: "123456"
+#            db: 0
+#            poolsize: 30
+#            minIdleConns: 30
+    #        influx:
+    #          configData:
+    #            url: http://localhost:8086
+    #            token: RrWA54MRuB726E7L7KHFzJeL9uDqJGOEbUjoK9gteTczXdG-nBisQymrO1AXU6K9vTGt67Rrqn1X_ypsq25VgQ==
+    #            org: test-org
+    #            bucket: test-bucket
+    #          dataStandard:
+    #            measurement: stat
+    #            tagKey: unit
+    #            tagValue: temperature
+    #            fieldKey: wbctest
+    - propertyName: random-float
+      customizedProtocol:
+        protocolName: virtualProtocol
+        configData:
+          dataType: float
+      collectCycle: 10000000000
+      pushMethod:
+#        http:
+#          hostName: "http://127.0.0.1"
+#          port: 30014
+#          #requestPath: "/test"
+#          timeout: 1000000
+        mqtt:
+          address: tcp://0.0.0.0:1883
+          topic: random-float
+          qos: 0
+          retained: false
+      reportCycle: 10000000000
+status:
+  twins:
+    - propertyName: random-int
+      reported:
+        metadata:
+          timestamp: '1550049403598'
+          type: integer
+        value: "100"
+      desired:
+        metadata:
+          timestamp: '1550049403598'
+          type: integer
+        value: "100"
+    - propertyName: random-float
+      reported:
+        metadata:
+          timestamp: '1550049403598'
+          type: float
+        value: "30"
+      desired:
+        metadata:
+          timestamp: '1550049403598'
+          type: float
+        value: "30"

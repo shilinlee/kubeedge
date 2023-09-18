@@ -3,6 +3,7 @@ package parse
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/fatih/structs"
@@ -48,6 +49,18 @@ func getPushMethodFromGrpc(visitor *dmiapi.DevicePropertyVisitor) (string, error
 	return "", errors.New("can not parse publish method")
 }
 
+func getDbProviderFromGrpc(visitor *dmiapi.DevicePropertyVisitor) (string, error) {
+	// TODO add more dbProvider
+	if visitor.DbProvider.Influx != nil {
+		return "influx", nil
+	} else if visitor.DbProvider.Redis != nil {
+		return "redis", nil
+	} else if visitor.DbProvider.Tdengine != nil {
+		return "tdengine", nil
+	}
+	return "", errors.New("can not parse dbProvider")
+}
+
 func BuildProtocolFromGrpc(device *dmiapi.Device) (common.Protocol, error) {
 	protocolName, err := getProtocolNameFromGrpc(device)
 	if err != nil {
@@ -90,9 +103,14 @@ func BuildProtocolFromGrpc(device *dmiapi.Device) (common.Protocol, error) {
 	}
 
 	var protocolConfig []byte
+	fmt.Println("-------")
+	fmt.Println(protocolName)
+	fmt.Println("----------")
 	switch protocolName {
 	case constants.Modbus:
+		klog.V(1).Info(device.Spec.Protocol.Modbus)
 		protocolConfig, err = json.Marshal(device.Spec.Protocol.Modbus)
+		klog.V(1).Info(protocolConfig)
 		if err != nil {
 			return common.Protocol{}, err
 		}
@@ -267,6 +285,7 @@ func buildPropertyVisitorsFromGrpc(device *dmiapi.Device) []common.PropertyVisit
 		return nil
 	}
 	res := make([]common.PropertyVisitor, 0, len(device.Spec.PropertyVisitors))
+	klog.V(1).Infof("In buildPropertyVisitorsFromGrpc, PropertyVisitors = %v", device.Spec.PropertyVisitors)
 	for _, pptv := range device.Spec.PropertyVisitors {
 		var visitorConfig []byte
 		switch protocolName {
@@ -307,19 +326,74 @@ func buildPropertyVisitorsFromGrpc(device *dmiapi.Device) []common.PropertyVisit
 			}
 		}
 
-		if pptv.PushMethod == nil {
-			cur := common.PropertyVisitor{
-				Name:          pptv.PropertyName,
-				PropertyName:  pptv.PropertyName,
-				ModelName:     device.Spec.DeviceModelReference,
-				CollectCycle:  pptv.GetCollectCycle(),
-				ReportCycle:   pptv.GetReportCycle(),
-				Protocol:      protocolName,
-				VisitorConfig: visitorConfig,
+		var dbProviderName string
+		var dbProvider common.ProviderConfig
+		if pptv.DbProvider != nil {
+			dbProviderName, err = getDbProviderFromGrpc(pptv)
+			if err != nil {
+				klog.Errorf("err: %+v", err)
+				return nil
 			}
-			res = append(res, cur)
-			continue
+			switch dbProviderName {
+			case "influx":
+				configdata, err := json.Marshal(pptv.DbProvider.Influx.ConfigData)
+				if err != nil {
+					klog.Errorf("err: %+v", err)
+					return nil
+				}
+				datastandard, err := json.Marshal(pptv.DbProvider.Influx.DataStandard)
+				if err != nil {
+					klog.Errorf("err: %+v", err)
+					return nil
+				}
+				dbProvider = common.ProviderConfig{
+					ConfigData:   configdata,
+					DataStandard: datastandard,
+				}
+			case "redis":
+				redisconfigdata, err := json.Marshal(pptv.DbProvider.Redis.RedisConfigData)
+				if err != nil {
+					klog.Errorf("err: %+v", err)
+					return nil
+				}
+				dbProvider = common.ProviderConfig{
+					RedisConfigData: redisconfigdata,
+				}
+			case "tdengine":
+				tdengineconfigdata, err := json.Marshal(pptv.DbProvider.Tdengine.TdengineConfigData)
+				if err != nil {
+					klog.Errorf("err: %+v", err)
+					return nil
+				}
+				dbProvider = common.ProviderConfig{
+					TdengineConfigData: tdengineconfigdata,
+				}
+			}
+
 		}
+		//dbProviderName, err := getDbProviderFromGrpc(pptv)
+		//if err != nil {
+		//	klog.Errorf("err: %+v", err)
+		//	return nil
+		//}
+		//var dbProvider common.ProviderConfig
+		//switch dbProviderName {
+		//case "influx":
+		//	configdata, err := json.Marshal(pptv.DbProvider.Influx.ConfigData)
+		//	if err != nil {
+		//		klog.Errorf("err: %+v", err)
+		//		return nil
+		//	}
+		//	datastandard, err := json.Marshal(pptv.DbProvider.Influx.DataStandard)
+		//	if err != nil {
+		//		klog.Errorf("err: %+v", err)
+		//		return nil
+		//	}
+		//	dbProvider = common.ProviderConfig{
+		//		ConfigData:   configdata,
+		//		DataStandard: datastandard,
+		//	}
+		//}
 		pushMethodName, err := getPushMethodFromGrpc(pptv)
 		if err != nil {
 			klog.Errorf("err: %+v", err)
@@ -355,8 +429,13 @@ func buildPropertyVisitorsFromGrpc(device *dmiapi.Device) []common.PropertyVisit
 				MethodName:   pushMethodName,
 				MethodConfig: pushMethod,
 			},
+			DbProvider: common.DbProviderConfig{
+				DbProviderName: dbProviderName,
+				ProviderConfig: dbProvider,
+			},
 		}
 		res = append(res, cur)
+
 	}
 	return res
 }
@@ -414,6 +493,7 @@ func ParseDeviceModelFromGrpc(model *dmiapi.DeviceModel) common.DeviceModel {
 }
 
 func ParseDeviceFromGrpc(device *dmiapi.Device, commonModel *common.DeviceModel) (*common.DeviceInstance, error) {
+
 	protocolName, err := getProtocolNameFromGrpc(device)
 	if err != nil {
 		return nil, err

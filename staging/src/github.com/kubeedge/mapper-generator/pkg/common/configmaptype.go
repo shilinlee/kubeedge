@@ -75,12 +75,25 @@ type PropertyVisitor struct {
 	Protocol      string           `json:"protocol,omitempty"`
 	VisitorConfig json.RawMessage  `json:"visitorConfig"`
 	PushMethod    PushMethodConfig `json:"pushMethod,omitempty"`
+	DbProvider    DbProviderConfig `json:"dbProvider,omitempty"`
 }
 
 // PushMethodConfig is structure to store push config
 type PushMethodConfig struct {
 	MethodName   string          `json:"MethodName"`
 	MethodConfig json.RawMessage `json:"MethodConfig"`
+}
+
+type DbProviderConfig struct {
+	DbProviderName string         `json:"dbProviderName"`
+	ProviderConfig ProviderConfig `json:"providerConfig"`
+}
+
+type ProviderConfig struct {
+	ConfigData         json.RawMessage `json:"configData"`
+	DataStandard       json.RawMessage `json:"dataStandard"`
+	RedisConfigData    json.RawMessage `json:" redisConfigData"`
+	TdengineConfigData json.RawMessage `json:"TdengineConfigData"`
 }
 
 // Data is data structure for the message that only be subscribed in edge node internal.

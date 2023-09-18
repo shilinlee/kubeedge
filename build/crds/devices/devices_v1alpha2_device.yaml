@@ -251,6 +251,83 @@ spec:
                       description: Customized values for visitor of provided protocols
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    dbProvider:
+                      description: DbProvider represents the protocol used to push
+                        data to database, please ensure that the mapper can access
+                        the destination address.
+                      properties:
+                        influx:
+                          description: method configuration for database
+                          properties:
+                            configData:
+                              description: ConfigData of influx database
+                              properties:
+                                bucket:
+                                  description: Bucket of the user in influx database
+                                  type: string
+                                org:
+                                  description: Org of the user in influx database
+                                  type: string
+                                token:
+                                  description: Token of the user in influx database
+                                  type: string
+                                url:
+                                  description: Url of influx database
+                                  type: string
+                              type: object
+                            dataStandard:
+                              description: DataStandard of the data to influx database
+                              properties:
+                                fieldKey:
+                                  description: FieldKey of the user data
+                                  type: string
+                                measurement:
+                                  description: Measurement of the user data
+                                  type: string
+                                tagKey:
+                                  description: TagKey of the user data
+                                  type: string
+                                tagValue:
+                                  description: TagValue of the user data
+                                  type: string
+                              type: object
+                          type: object
+                        redis:
+                          properties:
+                            redisConfigData:
+                              description: RedisConfigData of redis database
+                              properties:
+                                addr:
+                                  description: Addr of Redis database
+                                  type: string
+                                db:
+                                  description: Db of Redis database
+                                  format: int64
+                                  type: integer
+                                minIdleConns:
+                                  description: MinIdleConns of Redis database
+                                  format: int64
+                                  type: integer
+                                password:
+                                  description: Password of Redis database
+                                  type: string
+                                poolsize:
+                                  description: Poolsize of Redis database
+                                  format: int64
+                                  type: integer
+                              type: object
+                          type: object
+                        tdengine:
+                          properties:
+                            tdengineConfigData:
+                              description: TdengineConfigData of tdengine database
+                              properties:
+                                dsn:
+                                  description: Dsn of Tdengine database
+                                  type: string
+                              type: object
+                          type: object
+                      type: object
                     modbus:
                       description: Modbus represents a set of additional visitor config
                         fields of modbus protocol.
@@ -301,6 +378,56 @@ spec:
                         This should refer to one of the device properties defined
                         in the device model.'
                       type: string
+                    pushMethod:
+                      description: PushMethod represents the protocol used to push
+                        data, please ensure that the mapper can access the destination
+                        address.
+                      properties:
+                        customizedProtocol:
+                          description: CustomizedProtocol configuration for customized
+                            push method
+                          properties:
+                            configData:
+                              description: 'Required: The configData of customized
+                                protocol'
+                              type: object
+                              x-kubernetes-preserve-unknown-fields: true
+                            protocolName:
+                              description: 'Required: name of customized protocol'
+                              type: string
+                          type: object
+                        http:
+                          description: HTTP Push method configuration for http
+                          properties:
+                            hostName:
+                              type: string
+                            port:
+                              format: int64
+                              type: integer
+                            requestPath:
+                              type: string
+                            timeout:
+                              format: int64
+                              type: integer
+                          type: object
+                        mqtt:
+                          description: MQTT Push method configuration for mqtt
+                          properties:
+                            address:
+                              description: broker address, like mqtt://127.0.0.1:1883
+                              type: string
+                            qos:
+                              description: qos of mqtt publish param
+                              format: int32
+                              type: integer
+                            retained:
+                              description: Is the message retained
+                              type: boolean
+                            topic:
+                              description: publish topic for mqtt
+                              type: string
+                          type: object
+                      type: object
                     reportCycle:
                       description: Define how frequent mapper will report the value.
                       format: int64

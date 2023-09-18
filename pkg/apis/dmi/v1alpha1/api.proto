@@ -377,6 +377,104 @@ message DevicePropertyVisitor {
     VisitorConfigBluetooth bluetooth = 7;
     // the visitor to collect the properties of the device of customized protocol.
     VisitorConfigCustomized customizedProtocol = 8;
+    // the visitor to report properties of the value.
+    VisitorConfigPushMethod pushMethod = 9;
+
+    VisitorConfigDbProvider dbProvider = 10;
+}
+
+// the visitor to report properties of the value.
+message VisitorConfigPushMethod{
+    // the visitor to report the properties of the device by customized method.
+    VisitorConfigCustomized customizedProtocol = 1;
+    // the visitor to report the properties of the device by http.
+    PushMethodHTTP http = 2;
+    // the visitor to report the properties of the device by mqtt.
+    PushMethodMQTT mqtt = 3;
+}
+
+message VisitorConfigDbProvider{
+    // the config of database .
+    DbProviderInflux influx = 1;
+    DbProviderRedis  redis = 2;
+    DbProviderTdengine tdengine = 3;
+}
+
+message DbProviderInflux{
+    // the configData of influx database.
+    ConfigData configData = 1;
+    DataStandard dataStandard = 2;
+}
+
+message DataStandard{
+    // broker address, like mqtt://127.0.0.1:1883
+    string measurement = 1;
+    string tagKey = 2;
+    string tagValue = 3;
+    string fieldKey = 4;
+}
+
+message ConfigData{
+    // broker address, like mqtt://127.0.0.1:1883
+    string url = 1;
+    // publish topic for mqtt
+    string token = 2;
+    // qos of mqtt publish param
+    string org = 3;
+    // is the message retained
+    string bucket = 4;
+}
+
+message DbProviderRedis{
+    // the configData of redis database.
+    RedisConfigData redisConfigData = 1;
+}
+
+message RedisConfigData{
+    // Addr of Redis database
+    string addr = 1;
+    // Password of Redis database
+    string password = 2;
+    // Db of Redis database
+    int64 db = 3;
+    // Poolsize of Redis database
+    int64 poolsize  = 4;
+    // MinIdleConns of Redis database
+    int64 minIdleConns =5;
+}
+
+message DbProviderTdengine{
+    // the configData of tdengine database.
+    TdengineConfigData tdengineConfigData = 1;
+}
+
+message TdengineConfigData{
+    // Dsn of Tdengine database
+    string dsn = 1;
+}
+
+// the visitor to report the properties of the device by mqtt
+message PushMethodMQTT{
+    // broker address, like mqtt://127.0.0.1:1883
+    string address = 1;
+    // publish topic for mqtt
+    string topic = 2;
+    // qos of mqtt publish param
+    int32 qos = 3;
+    // is the message retained
+    bool retained = 4;
+}
+
+// the visitor to report the properties of the device by http.
+message PushMethodHTTP{
+    // host name for publish
+    string hostName = 1;
+    // port for publish
+    int64 port = 2;
+    // the URL path for the request, like /api/users
+    string requestPath = 3;
+    // timeout configuration for http request
+    int64 timeout = 4;
 }
 
 // the visitor to collect the properties of the device of OPC UA.
