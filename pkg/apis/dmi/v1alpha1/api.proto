@@ -380,7 +380,7 @@ message DevicePropertyVisitor {
     // the visitor to report properties of the value.
     VisitorConfigPushMethod pushMethod = 9;
 
-    VisitorConfigDbProvider dbProvider = 10;
+    VisitorConfigDBProvider dbProvider = 10;
 }
 
 // the visitor to report properties of the value.
@@ -393,14 +393,12 @@ message VisitorConfigPushMethod{
     PushMethodMQTT mqtt = 3;
 }
 
-message VisitorConfigDbProvider{
+message VisitorConfigDBProvider{
     // the config of database .
-    DbProviderInflux influx = 1;
-    DbProviderRedis  redis = 2;
-    DbProviderTdengine tdengine = 3;
+    DBProviderInflux influx = 1;
 }
 
-message DbProviderInflux{
+message DBProviderInflux{
     // the configData of influx database.
     ConfigData configData = 1;
     DataStandard dataStandard = 2;
@@ -423,34 +421,6 @@ message ConfigData{
     string org = 3;
     // is the message retained
     string bucket = 4;
-}
-
-message DbProviderRedis{
-    // the configData of redis database.
-    RedisConfigData redisConfigData = 1;
-}
-
-message RedisConfigData{
-    // Addr of Redis database
-    string addr = 1;
-    // Password of Redis database
-    string password = 2;
-    // Db of Redis database
-    int64 db = 3;
-    // Poolsize of Redis database
-    int64 poolsize  = 4;
-    // MinIdleConns of Redis database
-    int64 minIdleConns =5;
-}
-
-message DbProviderTdengine{
-    // the configData of tdengine database.
-    TdengineConfigData tdengineConfigData = 1;
-}
-
-message TdengineConfigData{
-    // Dsn of Tdengine database
-    string dsn = 1;
 }
 
 // the visitor to report the properties of the device by mqtt

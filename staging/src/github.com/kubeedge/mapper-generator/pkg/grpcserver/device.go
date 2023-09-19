@@ -54,9 +54,6 @@ func (s *Server) RegisterDevice(ctx context.Context, request *dmiapi.RegisterDev
 	}
 
 	deviceInstance.PProtocol = protocol
-	//klog.V(1).Info("--------")
-	//klog.V(1).Info(deviceInstance.PProtocol)
-	//klog.V(1).Info("--------")
 	s.devPanel.UpdateDev(&model, deviceInstance, &protocol)
 
 	return &dmiapi.RegisterDeviceResponse{DeviceName: device.Name}, nil

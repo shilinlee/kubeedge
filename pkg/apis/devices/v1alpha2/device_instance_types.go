@@ -262,21 +262,19 @@ type VisitorConfig struct {
 	// please ensure that the mapper can access the destination address.
 	// +optional
 	PushMethod *VisitorPushMethod `json:"pushMethod,omitempty"`
-	// DbProvider represents the protocol used to push data to database,
+	// DBProvider represents the protocol used to push data to database,
 	// please ensure that the mapper can access the destination address.
 	// +optional
-	DbProvider *DbProviderConfig `json:"dbProvider,omitempty"`
+	DBProvider *DBProviderConfig `json:"dbProvider,omitempty"`
 }
 
-type DbProviderConfig struct {
+type DBProviderConfig struct {
 	// method configuration for database
 	// +optional
-	Influx   *DbProviderInflux    `json:"influx,omitempty"`
-	Redis    *DbProviderRedis     `json:"redis,omitempty"`
-	Tdengine **DbProviderTdengine `json:"tdengine,omitempty"`
+	Influx *DBProviderInflux `json:"influx,omitempty"`
 }
 
-type DbProviderInflux struct {
+type DBProviderInflux struct {
 	// ConfigData of influx database
 	// +optional
 	ConfigData *ConfigData `json:"configData"`
@@ -313,42 +311,6 @@ type DataStandard struct {
 	// FieldKey of the user data
 	// +optional
 	FieldKey string `json:"fieldKey,omitempty"`
-}
-
-type DbProviderRedis struct {
-	// RedisConfigData of redis database
-	// +optional
-	RedisConfigData *RedisConfigData `json:"redisConfigData"`
-}
-
-type RedisConfigData struct {
-	// Addr of Redis database
-	// +optional
-	Addr string `json:"addr,omitempty"`
-	// Password of Redis database
-	// +optional
-	Password string `json:"password,omitempty"`
-	// Db of Redis database
-	// +optional
-	Db int64 `json:"db,omitempty"`
-	// Poolsize of Redis database
-	// +optional
-	Poolsize int64 `json:"poolsize,omitempty"`
-	// MinIdleConns of Redis database
-	// +optional
-	MinIdleConns int64 `json:"minIdleConns,omitempty"`
-}
-
-type DbProviderTdengine struct {
-	// TdengineConfigData of tdengine database
-	// +optional
-	TdengineConfigData *TdengineConfigData `json:"tdengineConfigData"`
-}
-
-type TdengineConfigData struct {
-	// Dsn of Tdengine database
-	// +optional
-	Dsn string `json:"dsn,omitempty"`
 }
 
 type VisitorPushMethod struct {

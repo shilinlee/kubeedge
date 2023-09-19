@@ -252,7 +252,7 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     dbProvider:
-                      description: DbProvider represents the protocol used to push
+                      description: DBProvider represents the protocol used to push
                         data to database, please ensure that the mapper can access
                         the destination address.
                       properties:
@@ -289,41 +289,6 @@ spec:
                                   type: string
                                 tagValue:
                                   description: TagValue of the user data
-                                  type: string
-                              type: object
-                          type: object
-                        redis:
-                          properties:
-                            redisConfigData:
-                              description: RedisConfigData of redis database
-                              properties:
-                                addr:
-                                  description: Addr of Redis database
-                                  type: string
-                                db:
-                                  description: Db of Redis database
-                                  format: int64
-                                  type: integer
-                                minIdleConns:
-                                  description: MinIdleConns of Redis database
-                                  format: int64
-                                  type: integer
-                                password:
-                                  description: Password of Redis database
-                                  type: string
-                                poolsize:
-                                  description: Poolsize of Redis database
-                                  format: int64
-                                  type: integer
-                              type: object
-                          type: object
-                        tdengine:
-                          properties:
-                            tdengineConfigData:
-                              description: TdengineConfigData of tdengine database
-                              properties:
-                                dsn:
-                                  description: Dsn of Tdengine database
                                   type: string
                               type: object
                           type: object
